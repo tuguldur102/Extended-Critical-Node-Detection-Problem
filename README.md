@@ -24,7 +24,7 @@ All experiments were conducted on **Ubuntu** using **Python 3.12**.
 
 To use the code, first clone the repository:
 ```bash
-git clone https://github.com/tuguldur102/StochasticCNDP.git
+[git clone https://github.com/tuguldur102/StochasticCNDP.git](https://github.com/tuguldur102/Extended-Critical-Node-Detection-Problem)
 ```
 
 Create a virtual environment (recommended):
