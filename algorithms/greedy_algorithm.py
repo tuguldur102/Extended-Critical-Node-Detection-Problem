@@ -1,40 +1,60 @@
 import networkx as nx
 from compute_PC import compute_pc
-from collections import defaultdict
 
 def greedy_algorithm(
     G: nx.Graph, terminals: list[int], 
-    K: int, case: int) -> list[int]:
+    k: int, case: 1 | 2) -> tuple[set, list[int]]:
   
   # If graph is too big, use sparse representation
   # for better memory usage
-  
-  S = []
 
-  for _ in range(K):
-    max_pc = float('-inf')
-    max_v = 0
+  T : set = set(terminals)
+  V : set = set(G.nodes)
 
-    V = list(G.nodes)
+  S : set = set()
+  pc_deltas : list[int] = []
 
-    for node in V:
+  for _ in range(k):
+
+    best_node = None
+    best_deg = -1
+    best_pc = float("inf")
+
+    # print(f"\nK: iteration\n")
+    for node in V - S:
 
       if case == 1:
         # case 1: S in V
-        current_pc = compute_pc(G, terminals)
+        S_j = S | {node}
+        pc_Sj = compute_pc(G=G, S=S_j, terminal_nodes=terminals)
+
+        print(f"node: {node} and pc Sj : {pc_Sj}")
 
       if case == 2:
         # case 2: S in V \ T
-        if node not in terminals:
-          current_pc = compute_pc(G, terminals)    
+        if node not in T:
+          S_j = S | {node}
+          pc_Sj = compute_pc(G=G, S=S_j, terminal_nodes=terminals)
 
-      if max_pc < current_pc:
-        max_pc = current_pc
-        max_v = node
+      # tie-breaker - if two nodes give the same best_pc
+      # get the one with higher degree
+      deg = G.degree(node)
 
-    S.append(max_v)
+      # argmin
+      if pc_Sj < best_pc or (pc_Sj == best_pc and deg > best_deg):
+        best_pc = pc_Sj
+        best_node = node
+        best_deg = deg
+        print(f"best node: {best_node} and best gain: {best_pc}")
 
-  return S
+    if best_node is None:
+      # No feasible solution
+      break 
+    
+    S.add(best_node)
+    pc_deltas.append(best_pc)
+
+  return S, pc_deltas
 
 
 

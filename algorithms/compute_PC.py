@@ -1,21 +1,22 @@
 import networkx as nx
 import math
-from utils.helpers_for_PC import bfs, connected_components
+from utils.helpers_for_PC import bfs, connected_components, comb_of_two
 
 def compute_pc(
-    G: nx.Graph, terminal_nodes: list[int]
-    ) -> int:
+    G: nx.Graph, S: set, 
+    terminal_nodes: list[int]) -> int:
+
+  # Remaining vertices after deletion
+  # V_remaining = set(G.nodes) - S
+  # num_rem = len(V_remaining)
+
+  T = set(terminal_nodes)
+
+  G_copy = G.copy()
+  G_copy.remove_nodes_from(S)
 
   # 1. Get connected components
-  # visited = [False] * len(G.nodes)
-  # components = []
-
-  # for v in list(G.nodes):
-  #   if not visited[v]:
-  #     comp = bfs(G, v, visited)
-  #     components.append(comp)
-
-  components = connected_components(G)
+  components = connected_components(G_copy)
 
   # 2. Exclude non-terminal nodes from the components
   excluded_components = []
@@ -23,16 +24,20 @@ def compute_pc(
   for comp in components:
     excluded_comp = []
     for v in comp:
-      if v in terminal_nodes:
+      if v in T:
         excluded_comp.append(v)
-      
-    excluded_components.append(excluded_comp)
 
-  # 3. Compute pairwise connectivity using comb(n, 2) = n! / (n - 2)! * 2!
-  pairwise_connectivity = 0
+    excluded_components.append(excluded_comp) 
 
-  for comp in excluded_components:
-    n = int(len(comp))
-    pairwise_connectivity += math.comb(n, 2)
+  # print(f"Excluded components: {excluded_components}")
+  
+  # 3. Compute pairwise connectivity across terminal nodes over components
+  total_pc = comb_of_two(excluded_components)
 
-  return pairwise_connectivity
+  ## More simpler usage:
+  # total_pc = 0
+  # for comp in connected_components(G_copy):
+  #   comp_count = sum(1 for v in comp if v in T)
+  #   total_pc += comp_count * (comp_count - 1) // 2
+
+  return total_pc

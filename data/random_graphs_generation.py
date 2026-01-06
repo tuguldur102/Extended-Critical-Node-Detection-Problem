@@ -39,3 +39,21 @@ def make_graph(spec: GraphSpec):
     case _:
      raise ValueError("Unsupported Graph Type!")
   
+def create_custom_graph_with_2_comps(terminal_nodes: list[int]) -> nx.Graph:
+
+  G = nx.Graph()
+
+  C1 = [(0, 1), (1, 2), (2, 3)]
+  C2 = [(4, 5), (5, 6)]
+
+  G.add_edges_from(C1)
+  G.add_edges_from(C2)
+
+  # Add terminal attribute to nodes
+  for v in G.nodes:
+    if v in terminal_nodes:
+      G.nodes[v]["terminal"] = True
+    else:
+      G.nodes[v]["terminal"] = False
+  
+  return G
